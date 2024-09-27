@@ -10,11 +10,12 @@ using namespace std;
 // CRC 
 string XOR(string a, string b){
     string ret = "";
+    int size = a.size();
     // for loop from i=1, to skip xor each first item
     // to handle two cases: 
     // 1. when both two strings are in the same size that start with 1, then to skip append the 0 to ret
     // 2. when two strings not in the same size, which means tmp_dividend.size() = divisor.size() + 1. tmp_dividend start with a zero
-    for (int i = 1; i < a.size(); ++i){
+    for (int i = 1; i < size; ++i){
         if (a[i] == b[i])
             ret += '0';
         else
@@ -24,10 +25,11 @@ string XOR(string a, string b){
 }
 
 string calculateCRC(string dividend, string divisor){
+    int size = dividend.size();
     int idx = divisor.size();
     string tmp_dividend = dividend.substr(0, idx);
 
-    while (idx < dividend.size()){
+    while (idx < size){
         if (tmp_dividend[0] == '1'){
             tmp_dividend = XOR(tmp_dividend, divisor) + dividend[idx];
         }
@@ -68,7 +70,7 @@ vector<string> separateToParts(string data, int partSize = 16) {
 
 vector<int> convertBinaryToDecimal(vector<string> binaryParts) {
     vector<int> decimalParts;
-    for (const auto& part : binaryParts) {
+    for (auto& part : binaryParts) {
         decimalParts.push_back(bitset<16>(part).to_ulong());
     }
     return decimalParts;
@@ -76,7 +78,7 @@ vector<int> convertBinaryToDecimal(vector<string> binaryParts) {
 
 int calculateSum(vector<int> numbers) {
     int sum = 0;
-    for (const auto& n : numbers) {
+    for (auto& n : numbers) {
         sum += n;
     }
     return sum;
@@ -88,7 +90,7 @@ string calculateChecksum(int sum, int divisor = 65536) {
     string binary = bitset<16>(remainder).to_string();
     
     string checksum = "";
-    for (const auto& bit : binary) {
+    for (auto& bit : binary) {
         checksum += (bit == '1') ? '0' : '1';
     }
     return checksum;
@@ -104,8 +106,10 @@ string CheckSum(string data) {
 }
 
 string introduceErrorBits(string data, string errorBits){
+    int size = data.size();
     string polluted_data = data;
-    for (int i = 0; i < data.size(); ++i){
+
+    for (int i = 0; i < size; ++i){
         if (errorBits[i] == '1') {
             polluted_data[i] = (polluted_data[i] == '0') ? '1' : '0';
         }
@@ -131,13 +135,13 @@ void printResult(string data, string errorBits){
     // Print result for CRC
     cout << "CRC-16" << endl;
     cout << "CRC: " << crc_code << "; \t\tResult: " 
-         << ((crc_code == polluted_crc_code) ? "Pass" : "Not Pass") 
+         << ((polluted_crc.substr(polluted_crc.size() - 16) == polluted_crc_code) ? "Pass" : "Not Pass") 
          << endl;
 
     // Print results for checksum
     cout << "Checksum" << endl;
     cout << "Checksum: " << checksum_code << "; \tResult: " 
-         << ((checksum_code == polluted_checksum_code) ? "Pass" : "Not Pass") 
+         << ((polluted_checksum.substr(polluted_crc.size() - 16) == polluted_checksum_code) ? "Pass" : "Not Pass") 
          << endl;
 }
 
@@ -152,7 +156,8 @@ int main(){
         string input, data, errorBits;
         
         while (getline(myfile, input)){
-            for (int i = 0; i < input.length(); ++i){
+            int size = input.size();
+            for (int i = 0; i < size; ++i){
                 if (input[i] == ' '){
                     data = input.substr(0, i);
                     errorBits = input.substr(i+1);
